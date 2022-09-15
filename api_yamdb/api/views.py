@@ -2,7 +2,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets
 
 from .filters import TitleFilter
-from .models import Category, Genre, Title
+from reviews.models import Category, Genre, Title
 from .serializers import (CategorySerializer, GenreSerializer,
                           TitleReadSerializer, TitleWriteSerializer)
 
