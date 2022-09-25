@@ -21,6 +21,7 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           TitleSerializer, TokenSerializer, UserEditSerializer,
                           UserSerializer)
 
+
 class ListCreateDestroyViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
@@ -28,6 +29,7 @@ class ListCreateDestroyViewSet(
     viewsets.GenericViewSet,
 ):
     pass
+
 
 class CategoryViewSet(ListCreateDestroyViewSet):
     queryset = Category.objects.all()
@@ -61,7 +63,10 @@ class TitleViewSet(viewsets.ModelViewSet):
             return ReadOnlyTitleSerializer
         return TitleSerializer
 
+
 EMAIL = 'denkolomna@mail.ru'
+
+
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])
 def register(request):
@@ -119,22 +124,19 @@ class UserViewSet(viewsets.ModelViewSet):
         permission_classes=[permissions.IsAuthenticated],
         serializer_class=UserEditSerializer,
     )
-    def users_own_profile(self, request):
+    def me(self, request):
         user = request.user
-        try:
-            if request.method == "PATCH":
-                serializer = self.get_serializer(
-                    user,
-                    data=request.data,
-                    partial=True
-                )
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            serializer = self.get_serializer(user)
+        if request.method == "PATCH":
+            serializer = self.get_serializer(
+                user,
+                data=request.data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        serializer = self.get_serializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

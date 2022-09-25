@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueValidator
 
 from reviews.models import Category, Comment, Genre, Review, Title, User
@@ -23,11 +22,12 @@ class ReviewSerializer(serializers.ModelSerializer):
         if request.method == 'POST':
             author = request.user
             title_id = self.context['view'].kwargs.get('title_id')
-            if Review.objects.filter(title_id=title_id, author=author).exists():
+            if Review.objects.filter(
+                    title_id=title_id,
+                    author=author).exists():
                 raise ValidationError('Вы не можете добавить более'
                                       'одного отзыва на произведение')
         return data
-        
 
     class Meta:
         model = Review
