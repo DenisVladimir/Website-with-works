@@ -81,7 +81,7 @@ def register(request):
     send_mail(
         subject="YaMDb registration",
         message=f"Your confirmation code: {confirmation_code}",
-        from_email= EMAIL,
+        from_email=EMAIL,
         recipient_list=[user.email],
     )
 
