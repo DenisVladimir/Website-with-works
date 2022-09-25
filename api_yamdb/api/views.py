@@ -8,6 +8,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework import mixins
 
 from reviews.models import Category, Genre, Review, Title, User
 from .filters import TitlesFilter
@@ -20,6 +21,13 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           TitleSerializer, TokenSerializer, UserEditSerializer,
                           UserSerializer)
 
+class ListCreateDestroyViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    pass
 
 class CategoryViewSet(ListCreateDestroyViewSet):
     queryset = Category.objects.all()
@@ -53,7 +61,7 @@ class TitleViewSet(viewsets.ModelViewSet):
             return ReadOnlyTitleSerializer
         return TitleSerializer
 
-
+EMAIL = 'denkolomna@mail.ru'
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])
 def register(request):
@@ -68,7 +76,7 @@ def register(request):
     send_mail(
         subject="YaMDb registration",
         message=f"Your confirmation code: {confirmation_code}",
-        from_email=None,
+        from_email= EMAIL,
         recipient_list=[user.email],
     )
 
@@ -113,19 +121,20 @@ class UserViewSet(viewsets.ModelViewSet):
     )
     def users_own_profile(self, request):
         user = request.user
-        if request.method == "GET":
+        try:
+            if request.method == "PATCH":
+                serializer = self.get_serializer(
+                    user,
+                    data=request.data,
+                    partial=True
+                )
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
             serializer = self.get_serializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        if request.method == "PATCH":
-            serializer = self.get_serializer(
-                user,
-                data=request.data,
-                partial=True
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        except:
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -134,7 +143,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
-
         return title.reviews.all()
 
     def perform_create(self, serializer):
