@@ -12,7 +12,7 @@ router_v1.register('titles', TitleViewSet)
 router_v1.register(r'titles/(?P<title_id>\d+)/reviews',
                    ReviewViewSet, basename='reviews')
 router_v1.register(r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)'
-                   r'/comments', CommentViewSet, basename='comments')
+                   '/comments', CommentViewSet, basename='comments')
 router_v1.register('users', UserViewSet)
 
 url_reg_tok = [
@@ -22,6 +22,5 @@ url_reg_tok = [
 
 urlpatterns = [
     path('v1/', include(router_v1.urls)),
-    path('v1/auth/', include(url_reg_tok)),
     path('v1/auth/', include(url_reg_tok)),
 ]

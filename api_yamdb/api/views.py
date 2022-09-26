@@ -12,7 +12,6 @@ from rest_framework import mixins
 
 from reviews.models import Category, Genre, Review, Title, User
 from .filters import TitlesFilter
-from .mixins import ListCreateDestroyViewSet
 from .permissions import (IsAdmin, IsAdminOrReadOnly,
                           IsAdminModeratorOwnerOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -64,9 +63,6 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleSerializer
 
 
-EMAIL = 'denkolomna@mail.ru'
-
-
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])
 def register(request):
@@ -81,7 +77,7 @@ def register(request):
     send_mail(
         subject="YaMDb registration",
         message=f"Your confirmation code: {confirmation_code}",
-        from_email=EMAIL,
+        from_email=None,
         recipient_list=[user.email],
     )
 
